@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	pb "github.com/go-graphite/protocol/carbonapi_v3_pb"
 )
 
@@ -26,13 +25,13 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *timeFunction) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	name, err := e.GetStringArg(0)
+func (f *timeFunction) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	name, err := ctx.E.GetStringArg(0)
 	if err != nil {
 		return nil, err
 	}
 
-	stepInt, err := e.GetIntArgDefault(1, 60)
+	stepInt, err := ctx.E.GetIntArgDefault(1, 60)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +45,8 @@ func (f *timeFunction) Do(e parser.Expr, from, until int64, values map[parser.Me
 	//     newValues.append(time.mktime(when.timetuple()))
 	//     when += delta
 
-	newValues := make([]float64, (until-from-1+step)/step)
-	value := from
+	newValues := make([]float64, (ctx.Until-ctx.From-1+step)/step)
+	value := ctx.From
 	for i := 0; i < len(newValues); i++ {
 		newValues[i] = float64(value)
 		value += step
@@ -56,8 +55,8 @@ func (f *timeFunction) Do(e parser.Expr, from, until int64, values map[parser.Me
 	p := types.MetricData{
 		FetchResponse: pb.FetchResponse{
 			Name:              name,
-			StartTime:         from,
-			StopTime:          until,
+			StartTime:         ctx.From,
+			StopTime:          ctx.Until,
 			StepTime:          step,
 			Values:            newValues,
 			ConsolidationFunc: "max",

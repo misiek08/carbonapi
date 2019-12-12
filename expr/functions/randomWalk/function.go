@@ -3,7 +3,6 @@ package randomWalk
 import (
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	pb "github.com/go-graphite/protocol/carbonapi_v3_pb"
 	"math/rand"
 )
@@ -27,20 +26,20 @@ func New(configFile string) []interfaces.FunctionMetadata {
 }
 
 // squareRoot(seriesList)
-func (f *randomWalk) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	name, err := e.GetStringArg(0)
+func (f *randomWalk) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	name, err := ctx.E.GetStringArg(0)
 	if err != nil {
 		name = "randomWalk"
 	}
 
-	size := until - from
+	size := ctx.Until - ctx.From
 
 	r := types.MetricData{FetchResponse: pb.FetchResponse{
 		Name:              name,
 		Values:            make([]float64, size),
 		StepTime:          1,
-		StartTime:         from,
-		StopTime:          until,
+		StartTime:         ctx.From,
+		StopTime:          ctx.Until,
 		ConsolidationFunc: "average",
 	}}
 

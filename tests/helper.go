@@ -32,7 +32,7 @@ func (evaluator *FuncEvaluator) EvalExpr(e parser.Expr, from, until int64, value
 		return nil, parser.ErrMissingArgument
 	}
 
-	return evaluator.eval(e, from, until, values)
+	return evaluator.eval(interfaces.FunctionCallContext{E: e, From: from, Until: until, Values: values})
 }
 
 func EvaluatorFromFunc(function interfaces.Function) interfaces.Evaluator {

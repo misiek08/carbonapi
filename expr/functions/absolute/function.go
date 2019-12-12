@@ -6,7 +6,6 @@ import (
 	"github.com/go-graphite/carbonapi/expr/helper"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 )
 
 type absolute struct {
@@ -26,8 +25,8 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *absolute) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	return helper.ForEachSeriesDo(e, from, until, values, func(a *types.MetricData, r *types.MetricData) *types.MetricData {
+func (f *absolute) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	return helper.ForEachSeriesDo(ctx.E, ctx.From, ctx.Until, ctx.Values, func(a *types.MetricData, r *types.MetricData) *types.MetricData {
 		for i, v := range a.Values {
 			if math.IsNaN(a.Values[i]) {
 				r.Values[i] = math.NaN()

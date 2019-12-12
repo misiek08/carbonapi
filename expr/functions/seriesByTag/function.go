@@ -23,10 +23,10 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *seriesByTag) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
+func (f *seriesByTag) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
 	var results []*types.MetricData
-	key := parser.MetricRequest{Metric: e.ToString(), From: from, Until: until}
-	data, ok := values[key]
+	key := parser.MetricRequest{Metric: ctx.E.ToString(), From: ctx.From, Until: ctx.Until}
+	data, ok := ctx.Values[key]
 	if !ok {
 		return results, nil
 	}

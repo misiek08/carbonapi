@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	pb "github.com/go-graphite/protocol/carbonapi_v3_pb"
 )
 
@@ -26,8 +25,8 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *constantLine) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	value, err := e.GetFloatArg(0)
+func (f *constantLine) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	value, err := ctx.E.GetFloatArg(0)
 
 	if err != nil {
 		return nil, err
@@ -35,9 +34,9 @@ func (f *constantLine) Do(e parser.Expr, from, until int64, values map[parser.Me
 	p := types.MetricData{
 		FetchResponse: pb.FetchResponse{
 			Name:              fmt.Sprintf("%g", value),
-			StartTime:         from,
-			StopTime:          until,
-			StepTime:          until - from,
+			StartTime:         ctx.From,
+			StopTime:          ctx.Until,
+			StepTime:          ctx.Until - ctx.From,
 			Values:            []float64{value, value},
 			ConsolidationFunc: "max",
 		},

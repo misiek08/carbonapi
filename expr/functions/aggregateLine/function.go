@@ -8,7 +8,6 @@ import (
 	"github.com/go-graphite/carbonapi/expr/helper"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	pb "github.com/go-graphite/protocol/carbonapi_v3_pb"
 )
 
@@ -30,8 +29,9 @@ func New(configFile string) []interfaces.FunctionMetadata {
 }
 
 // aggregateLine(*seriesLists)
-func (f *aggregateLine) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	args, err := helper.GetSeriesArg(e.Args()[0], from, until, values)
+func (f *aggregateLine) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	e := ctx.E
+	args, err := helper.GetSeriesArg(e.Args()[0], ctx.From, ctx.Until, ctx.Values)
 	if err != nil {
 		return nil, err
 	}

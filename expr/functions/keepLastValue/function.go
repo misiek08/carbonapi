@@ -5,7 +5,6 @@ import (
 	"github.com/go-graphite/carbonapi/expr/helper"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	"math"
 )
 
@@ -28,19 +27,19 @@ func New(configFile string) []interfaces.FunctionMetadata {
 }
 
 // keepLastValue(seriesList, limit=inf)
-func (f *keepLastValue) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	arg, err := helper.GetSeriesArg(e.Args()[0], from, until, values)
+func (f *keepLastValue) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	arg, err := helper.GetSeriesArg(ctx.E.Args()[0], ctx.From, ctx.Until, ctx.Values)
 	if err != nil {
 		return nil, err
 	}
 
-	keep, err := e.GetIntNamedOrPosArgDefault("limit", 1, -1)
+	keep, err := ctx.E.GetIntNamedOrPosArgDefault("limit", 1, -1)
 	if err != nil {
 		return nil, err
 	}
-	_, ok := e.NamedArgs()["limit"]
+	_, ok := ctx.E.NamedArgs()["limit"]
 	if !ok {
-		ok = len(e.Args()) > 1
+		ok = len(ctx.E.Args()) > 1
 	}
 
 	var results []*types.MetricData

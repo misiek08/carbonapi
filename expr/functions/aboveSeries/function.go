@@ -7,7 +7,6 @@ import (
 	"github.com/go-graphite/carbonapi/expr/helper"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 )
 
 type aboveSeries struct {
@@ -28,24 +27,24 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *aboveSeries) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	args, err := helper.GetSeriesArg(e.Args()[0], from, until, values)
+func (f *aboveSeries) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	args, err := helper.GetSeriesArg(ctx.E.Args()[0], ctx.From, ctx.Until, ctx.Values)
 	if err != nil {
 		return nil, err
 	}
 
-	max, err := e.GetFloatArg(1)
+	max, err := ctx.E.GetFloatArg(1)
 	if err != nil {
 		return nil, err
 	}
 
 	rename := true
-	search, err := e.GetStringArg(2)
+	search, err := ctx.E.GetStringArg(2)
 	if err != nil {
 		rename = false
 	}
 
-	replace, err := e.GetStringArg(3)
+	replace, err := ctx.E.GetStringArg(3)
 	if err != nil {
 		rename = false
 	}

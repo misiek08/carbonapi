@@ -4,7 +4,6 @@ import (
 	"github.com/go-graphite/carbonapi/expr/functions/cairo/png"
 	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 )
 
 type cairo struct {
@@ -25,8 +24,8 @@ func New(configFile string) []interfaces.FunctionMetadata {
 	return res
 }
 
-func (f *cairo) Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-	return png.EvalExprGraph(e, from, until, values)
+func (f *cairo) Do(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+	return png.EvalExprGraph(ctx)
 }
 
 func (f *cairo) Description() map[string]types.FunctionDescription {

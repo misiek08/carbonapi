@@ -3,14 +3,14 @@
 package png
 
 import (
+	"github.com/go-graphite/carbonapi/expr/interfaces"
 	"github.com/go-graphite/carbonapi/expr/types"
-	"github.com/go-graphite/carbonapi/pkg/parser"
 	"net/http"
 )
 
 const HaveGraphSupport = false
 
-func EvalExprGraph(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
+func EvalExprGraph(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
 	return nil, nil
 }
 
