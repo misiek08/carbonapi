@@ -44,11 +44,17 @@ type FunctionMetadata struct {
 	F     Function
 }
 
+type FunctionCallContext struct {
+	E parser.Expr
+	From, Until int64
+	Values map[parser.MetricRequest][]*types.MetricData
+}
+
 // Function is interface that all graphite functions should follow
 type Function interface {
 	SetEvaluator(evaluator Evaluator)
 	GetEvaluator() Evaluator
-	Do(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error)
+	Do(ctx FunctionCallContext) ([]*types.MetricData, error)
 	Description() map[string]types.FunctionDescription
 }
 

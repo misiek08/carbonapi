@@ -4,6 +4,18 @@ import (
 	"strconv"
 )
 
+type Interval int64
+
+const (
+	Second Interval = 1
+	Minute = Second * 60
+	Hour = Minute * 60
+	Day = Hour * 24
+	Week = Day * 7
+	Month = Week * 4
+	Year = Month * 12
+)
+
 // IntervalString converts a sign and string into a number of seconds
 func IntervalString(s string, defaultSign int) (int32, error) {
 

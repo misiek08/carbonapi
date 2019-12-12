@@ -2,6 +2,7 @@ package expr
 
 import (
 	"fmt"
+	"github.com/go-graphite/carbonapi/expr/interfaces"
 
 	// Import all known functions
 	_ "github.com/go-graphite/carbonapi/expr/functions"
@@ -45,7 +46,7 @@ func EvalExpr(e parser.Expr, from, until int64, values map[parser.MetricRequest]
 	f, ok := metadata.FunctionMD.Functions[e.Target()]
 	metadata.FunctionMD.RUnlock()
 	if ok {
-		v, err := f.Do(e, from, until, values)
+		v, err := f.Do(interfaces.FunctionCallContext{e, from, until, values})
 		if err != nil {
 			err = fmt.Errorf("function=%s, err=%v", e.Target(), err)
 		}

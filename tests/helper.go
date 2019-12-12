@@ -15,7 +15,7 @@ import (
 )
 
 type FuncEvaluator struct {
-	eval func(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error)
+	eval func(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error)
 }
 
 func (evaluator *FuncEvaluator) EvalExpr(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
@@ -45,11 +45,11 @@ func EvaluatorFromFunc(function interfaces.Function) interfaces.Evaluator {
 
 func EvaluatorFromFuncWithMetadata(metadata map[string]interfaces.Function) interfaces.Evaluator {
 	e := &FuncEvaluator{
-		eval: func(e parser.Expr, from, until int64, values map[parser.MetricRequest][]*types.MetricData) ([]*types.MetricData, error) {
-			if f, ok := metadata[e.Target()]; ok {
-				return f.Do(e, from, until, values)
+		eval: func(ctx interfaces.FunctionCallContext) ([]*types.MetricData, error) {
+			if f, ok := metadata[ctx.E.Target()]; ok {
+				return f.Do(ctx)
 			}
-			return nil, fmt.Errorf("unknown function: %v", e.Target())
+			return nil, fmt.Errorf("unknown function: %v", ctx.E.Target())
 		},
 	}
 	return e
